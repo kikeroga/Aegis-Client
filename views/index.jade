@@ -1,0 +1,15 @@
+extends layout
+
+block content
+  h1= title
+  p Welcome to #{title}
+  table
+    tbody
+      tr
+        td device1:
+        td#device1 none
+      tr
+        td device2:
+        td#device2 none
+  input#value(type='text', name='value')
+  button#button Send
