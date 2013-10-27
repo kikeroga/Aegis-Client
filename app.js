@@ -1,18 +1,15 @@
-
-/**
- * Module dependencies.
- */
+// const DESTINATION = 'http://localhost:3000';
+const DESTINATION = 'http://aegis-server.herokuapp.com';
 
 var express = require('express');
 var routes = require('./routes/main.js');
 var user = require('./routes/user');
 var http = require('http');
 var path = require('path');
-//var io = require('socket.io-client');
+var io = require('socket.io-client');
 
 var app = express();
 
-// all environments
 app.set('port', process.env.PORT || 4000);
 app.set('views', __dirname + '/views');
 app.set('view engine', 'jade');
@@ -23,7 +20,6 @@ app.use(express.methodOverride());
 app.use(app.router);
 app.use(express.static(path.join(__dirname, 'public')));
 
-// development only
 if ('development' == app.get('env')) {
   app.use(express.errorHandler());
 }
@@ -31,19 +27,19 @@ if ('development' == app.get('env')) {
 //----------------------------------------------------------------------//
 
 app.get('/', routes.index);
-// app.get('/users', user.list);
 
 var server = http.createServer(app).listen(app.get('port'), function(){
-  console.log('Express server listening on port ' + app.get('port'));
+    console.log('Express server listening on port ' + app.get('port'));
 });
-var io = require('socket.io-client').listen(server);
+//var io = require('socket.io-client').listen(server);
+//var io = require('socket.io-client');
 
-var socket = io.connect('http://localhost:3000');
-// var socket = io.connect('http://chack-yourself-server.herokuapp.com:3000');
+// Recieve
+var socket = io.connect(DESTINATION);
 socket.on('connect', function() {
-    console.log('connected!');
+    console.log('Connect to Server: ' + DESTINATION);
 
-    socket.on('valueChange', function(value1) {
-        console.log('Receive value:' + value1);
+    socket.on('update', function(value) {
+        console.log(DESTINATION + ': ' + value);
     });
 });
