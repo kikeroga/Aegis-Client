@@ -1,13 +1,10 @@
 const PORT = 4000;
-// const DESTINATION = 'http://localhost:3000'; 
-//const DESTINATION = 'http://aegis-server.herokuapp.com:3000'; 
 
 var express = require('express');
 var routes = require('./routes/main.js');
 var user = require('./routes/user');
 var http = require('http');
 var path = require('path');
-//var io = require('socket.io-client');
 
 var app = express();
 
