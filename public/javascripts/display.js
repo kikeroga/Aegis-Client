@@ -1,26 +1,7 @@
 $(function() {
     const DESTINATION = 'http://localhost:3000';
-    //const DESTINATION = 'http://aegis-server.herokuapp.com';
+    // const DESTINATION = 'http://aegis-server.herokuapp.com';
     
-/*
-    var socket = io.connect(DESTINATION);
-    socket.on('connect', function(){
-        socket.on('init', function (value) {
-            console.log('init');
-            $('#device1').html(value);
-        });
-        socket.on('update', function (value) {
-            console.log('Receive: ' + value);
-            $('#device1').html(value);
-        });
-    });
-
-    $('#button').on('click', function(){
-        var value = $('#value').val()
-        socket.emit('change', value);
-        console.log('Send: ' + value);
-    });
-*/
     var socket = io.connect(DESTINATION);
     socket.on('connect', function(){
         socket.on('init', function (value) {
@@ -46,7 +27,7 @@ $(function() {
     });
 
 
-
+    // Bubble
 
     //var diameter = 960,
     var diameter = 320,
@@ -69,15 +50,6 @@ $(function() {
         .attr("fill","red");
 
     function drawCircle(value) {
-/*
-        var circle = svg.append("circle")
-            .attr("cx",100)
-            .attr("cy",100)
-            .attr("r",value)
-            .attr("fill","red")
-            .attr("stroke","orange")
-            .attr("stroke-width",10);
-*/
-        circle.attr("r",value);
+        circle.attr("r", value);
     }
 });
