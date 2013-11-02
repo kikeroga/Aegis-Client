@@ -1,36 +1,38 @@
 $(function() {
     const DESTINATION = 'http://localhost:3000';
     // const DESTINATION = 'http://aegis-server.herokuapp.com';
+    const COLOR_OK = '#33FF00';
+    const COLOR_WARNING = '#FFFF00';
+    const COLOR_CRITICAL = '#F83738';
     
     var socket = io.connect(DESTINATION);
     socket.on('connect', function(){
         socket.on('init', function (value) {
             console.log('init');
-            $('#device1').html(value);
+            $('#value1').html(value);
             $('#range').val(value);
-            drawCircle(value);
+            drawDevice1Circle(value);
         });
         socket.on('update', function (value) {
             console.log('Receive: ' + value);
-            $('#device1').html(value);
-            //$('#range').value(value);
+            $('#value1').html(value);
             $('#range').val(value);
-            drawCircle(value);
+            drawDevice1Circle(value);
         });
     });
 
     $('#range').on('change', function(){
         var value = $('#range').val()
         socket.emit('change', value);
-        console.log('Send: ' + value);
-        drawCircle(value);
+        drawDevice1Circle(value);
     });
 
+//----------------------------------------------------------------------//
 
-    // Bubble
+    // Bubble chart
 
-    //var diameter = 960,
     var diameter = 320,
+    //var diameter = 960,
     format = d3.format(",d"),
     color = d3.scale.category20c();
 
@@ -44,12 +46,53 @@ $(function() {
         .attr("height", diameter)
         .attr("class", "bubble");
 
-    var circle = svg.append("circle")
-        .attr("cx",100)
-        .attr("cy",100)
-        .attr("fill","red");
+    function classes(root) {
+        var classes = [];
 
-    function drawCircle(value) {
-        circle.attr("r", value);
+        function recurse(name, node) {
+        if (node.children) node.children.forEach(function(child) { recurse(node.name, child); });
+        else classes.push({packageName: name, className: node.name, value: node.size});
+        }
+
+        recurse(null, root);
+        return {children: classes};
+    }
+
+    d3.json("javascripts/data.json", function(error, root) {
+        var node = svg.selectAll(".node")
+            .data(bubble.nodes(classes(root))
+            .filter(function(d) { return !d.children; }))
+            .enter().append("g")
+            .attr("class", "node")
+            .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+
+        node.append("title")
+            .text(function(d) { return d.className + ": " + format(d.value); });
+
+        node.append("circle")
+            .attr("r", function(d) { return d.r; })
+            //.attr("id", "device1")
+            .attr("id", function(d) { return d.className.substring(0, d.r / 3); })
+            .style("fill", COLOR_OK);
+
+        node.append("text")
+            .attr("dy", ".3em")
+            .style("text-anchor", "middle")
+            //.style("fill", "white")
+            .text(function(d) { return d.className.substring(0, d.r / 3); });
+    });
+
+    d3.select(self.frameElement).style("height", diameter + "px");
+
+    function drawDevice1Circle(value) {
+        var color;
+        if (70 < value) {
+           color = COLOR_OK;
+        } else if (30 < value) {
+           color = COLOR_WARNING;
+        } else {
+           color = COLOR_CRITICAL;
+        }
+        d3.select('#device1').style("fill", color);
     }
 });

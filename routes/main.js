@@ -4,5 +4,5 @@
  */
 
 exports.index = function(req, res){
-  res.render('index', { title: 'Aegis Fastener System' });
+  res.render('index', { title: 'Aegis Fastener System (DEMO)' });
 };
