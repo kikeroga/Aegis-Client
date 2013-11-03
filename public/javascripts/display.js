@@ -4,35 +4,56 @@ $(function() {
     const COLOR_OK = '#33FF00';
     const COLOR_WARNING = '#FFFF00';
     const COLOR_CRITICAL = '#F83738';
-    
+    const COLOR_RIGHT = '#EEEEEC';
+    const COLOR_LEFT = '#1C2534';
+    //const COLOR_LEFT = '#051534';
+
     var socket = io.connect(DESTINATION);
     socket.on('connect', function(){
-        socket.on('init', function (value) {
+        socket.on('init', function (message) {
             console.log('init');
-            $('#value1').html(value);
-            $('#range').val(value);
-            drawDevice1Circle(value);
+            updateValues(message);
         });
-        socket.on('update', function (value) {
-            console.log('Receive: ' + value);
-            $('#value1').html(value);
-            $('#range').val(value);
-            drawDevice1Circle(value);
+        socket.on('update', function (message) {
+            console.log('Receive: ' + message);
+            updateValues(message);
         });
     });
 
+    function updateValues(message) {
+        var json, device1, device2;
+        try {
+            json = JSON.parse(message);
+        } catch(e) {
+            console.log(e);
+            return;
+        }
+        var value1 = json.device1;
+        var value2 = json.device2;
+
+        $('#value1').html(value1);
+        $('#value2').html(value2);
+        $('#range').val(value2);
+
+        d3.select('#device1').style("fill", COLOR_LEFT);
+        d3.select('#device2').style("fill", COLOR_RIGHT);
+
+        // text1.style("fill", "blue");
+    }
+
     $('#range').on('change', function(){
         var value = $('#range').val()
-        socket.emit('change', value);
-        drawDevice1Circle(value);
+        // idはダミー
+        var message = '{ "id": "device2", "value": ' + value + ' }';
+        socket.emit('change', message);
+//        changeCircleColor('device2', value);
     });
 
 //----------------------------------------------------------------------//
 
     // Bubble chart
 
-    var diameter = 320,
-    //var diameter = 960,
+    var diameter = 960,
     format = d3.format(",d"),
     color = d3.scale.category20c();
 
@@ -64,27 +85,30 @@ $(function() {
             .filter(function(d) { return !d.children; }))
             .enter().append("g")
             .attr("class", "node")
-            .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+            //.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+            .attr("transform", function(d) { return "translate(" + d.x + "," + 250 + ")"; });
 
         node.append("title")
             .text(function(d) { return d.className + ": " + format(d.value); });
 
         node.append("circle")
+            .attr("cy", 20)
             .attr("r", function(d) { return d.r; })
-            //.attr("id", "device1")
             .attr("id", function(d) { return d.className.substring(0, d.r / 3); })
-            .style("fill", COLOR_OK);
+            .style("fill", "white");
 
         node.append("text")
-            .attr("dy", ".3em")
+            .attr("id", function(d) { return d.className.substring(0, d.r / 3); })
+            .style("font-size", "60")
             .style("text-anchor", "middle")
-            //.style("fill", "white")
+            .style("fill", "gray")
+            //.style("font-color", function(d) { return d.fontColor; })
             .text(function(d) { return d.className.substring(0, d.r / 3); });
     });
 
     d3.select(self.frameElement).style("height", diameter + "px");
 
-    function drawDevice1Circle(value) {
+    function changeCircleColor(id, value) {
         var color;
         if (70 < value) {
            color = COLOR_OK;
@@ -93,6 +117,6 @@ $(function() {
         } else {
            color = COLOR_CRITICAL;
         }
-        d3.select('#device1').style("fill", color);
+        d3.select('#' + id).style("fill", color);
     }
 });
