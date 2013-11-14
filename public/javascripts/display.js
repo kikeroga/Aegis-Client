@@ -4,7 +4,7 @@ $(function() {
     const COLOR_OK = '#33FF00';
     const COLOR_WARNING = '#FFFF00';
     const COLOR_CRITICAL = '#F83738';
-    const COLOR_RIGHT = '#EEEEEC';
+    const COLOR_RIGHT = '#EEEAEC';
     const COLOR_LEFT = '#1C2534';
     //const COLOR_LEFT = '#051534';
 
@@ -38,6 +38,9 @@ $(function() {
         d3.select('#device1').style("fill", COLOR_LEFT);
         d3.select('#device2').style("fill", COLOR_RIGHT);
 
+        changeSize('#device1', value1);
+        changeSize('#device2', value2);
+
         // text1.style("fill", "blue");
     }
 
@@ -53,7 +56,8 @@ $(function() {
 
     // Bubble chart
 
-    var diameter = 960,
+    //var diameter = 960,
+    var diameter = 1280,
     format = d3.format(",d"),
     color = d3.scale.category20c();
 
@@ -118,5 +122,11 @@ $(function() {
            color = COLOR_CRITICAL;
         }
         d3.select('#' + id).style("fill", color);
+    }
+
+    function changeSize(id, value) {
+        //d3.select(id).attr("r", value + 130)
+        //d3.select(id).attr("r", value*1.5 + 50)
+        d3.select(id).attr("r", value*2 + 50)
     }
 });
